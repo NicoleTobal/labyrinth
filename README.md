@@ -1,0 +1,2 @@
+# labyrinth
+Smart contract game
