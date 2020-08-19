@@ -1,0 +1,19 @@
+{
+  "name": "labyrinth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test --network development",
+    "compile": "truffle compile --network staging",
+    "deploy": "truffle migrate --network staging"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^1.0.42"
+  }
+}
