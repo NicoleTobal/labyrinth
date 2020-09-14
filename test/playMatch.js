@@ -4,11 +4,10 @@ contract("Matches played", async accounts => {
 
   let instance;
 
-  beforeEach(function() {
-    return Matches.new()
-    .then(function(matchesInstance) {
-        instance = matchesInstance;
-    });
+  beforeEach(async() => {
+    const newInstance = await Matches.new();
+    instance = newInstance;
+    return;
   });
 
   it("should make invalid move and get an error", async () => {
@@ -18,7 +17,7 @@ contract("Matches played", async accounts => {
     await instance.addMove(player, 0, 1, 0);
     try {
       // Player tries to move right
-      await instance.move(player, 1);
+      await instance.move(1, { from: player });
       // If contract allows move, then test failed
       throw new Error('Test failed');
     } catch (error) {
@@ -27,21 +26,21 @@ contract("Matches played", async accounts => {
     }
   });
 
-  it("should win the match and have no moves left", async () => {
+  it("should win the match and cannot continue playing", async () => {
     let player = accounts[1];
     await instance.startMatch(player, 0, 9);
     // Contract owner adds left move
     await instance.addMove(player, 0, 9, 0);
     // Player moves left
-    await instance.move(player, 0);
+    await instance.move(0, { from: player });
     try {
       // Player tries to move right
-      await instance.move(player, 1);
+      await instance.move(1, { from: player });
       // If contract allows move, then test failed
       throw new Error('Test failed');
     } catch (error) {
       // Error of invalid move
-      assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert No moves left -- Reason given: No moves left.')
+      assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert Match should exist -- Reason given: Match should exist.')
     }
   });
 
@@ -51,11 +50,11 @@ contract("Matches played", async accounts => {
     // Contract owner adds left move
     await instance.addMove(player, 0, 1, 0);
     // Player moves left
-    await instance.move(player, 0);
+    await instance.move(0, { from: player });
     // Contract owner adds top move
     await instance.addMove(player, 1, 9, 2);
     // Player moves top and wins
-    await instance.move(player, 2);
+    await instance.move(2, { from: player });
     // Todo: search log
     // Gets ranking
     let rankingData = await instance.getUsersResultData(player, 0);

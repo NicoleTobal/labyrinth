@@ -5,6 +5,9 @@ import "./Labyrinth.sol";
 contract Matches is Ranking {
   address owner;
   mapping (address => Labyrinth) public matches; // Current matches
+  event MatchStartRequest(address);
+  event MatchStarted(address);
+  event MatchEnded(address);
 
   constructor() public {
     owner = msg.sender;
@@ -12,10 +15,6 @@ contract Matches is Ranking {
 
   modifier onlyOwner() {
     if (msg.sender == owner) _;
-  }
-
-  modifier onlyOwnerOrPlayer(address player) {
-    if (msg.sender == owner || msg.sender == player) _;
   }
   
   function _verifyMatchExists(address player) internal view {
@@ -27,10 +26,23 @@ contract Matches is Ranking {
     _;
   }
 
+  // Ends match
+  function _endMatch(address player) internal {
+    matches[player].cleanMoves();
+    delete matches[player];
+    emit MatchEnded(player);
+  }
+
+  // Requests a new match for a given player
+  function requestStartMatch() public {
+    emit MatchStartRequest(msg.sender);
+  }
+
   // Begins a new match or restarts an existent one for a given player
-  function startMatch(address player, uint8 position, uint8 lastPosition) public onlyOwnerOrPlayer(player) {
+  function startMatch(address player, uint8 position, uint8 lastPosition) public onlyOwner {
     // Creates a new Labyrinth instance with its initial and ending position
     matches[player] = new Labyrinth(player, position, lastPosition);
+    emit MatchStarted(player);
   }
 
   // Adds move for a player's map
@@ -38,19 +50,20 @@ contract Matches is Ranking {
     matches[player].addMove(from, to, _move);
   }
 
-  // Moves
-  function move(address player, Labyrinth.Moves _move) public onlyOwnerOrPlayer(player) doesMatchExist(player) {
-    Labyrinth playersMatch = matches[player];
+  // Player moves
+  function move(Labyrinth.Moves _move) public doesMatchExist(msg.sender) {
+    Labyrinth playersMatch = matches[msg.sender];
     uint8 moves = playersMatch.move(_move);
     if (playersMatch.currentPosition() == playersMatch.lastPosition()) {
       // Adds player to ranking
-      this.addToRanking(player, moves);
+      this.addToRanking(msg.sender, moves);
+      _endMatch(msg.sender);
     }
   }
 
   // Moves back
-  function moveBack(address player) public onlyOwnerOrPlayer(player) doesMatchExist(player) {
-    matches[player].moveBack();
+  function moveBack() public doesMatchExist(msg.sender) {
+    matches[msg.sender].moveBack();
   }
 
   // Ends matches for given players
@@ -60,11 +73,5 @@ contract Matches is Ranking {
       matches[players[i]].cleanMoves();
       delete matches[players[i]];
     }
-  }
-
-  // Ends match
-  function endMatch(address player) public onlyOwnerOrPlayer(player) doesMatchExist(player) {
-    matches[player].cleanMoves();
-    delete matches[player];
   }
 }

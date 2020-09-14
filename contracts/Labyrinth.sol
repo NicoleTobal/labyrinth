@@ -25,15 +25,6 @@ contract Labyrinth {
     if (msg.sender == owner) _;
   }
 
-  modifier onlyOwnerOrPlayer() {
-    if (msg.sender == owner || msg.sender == player) _;
-  }
-
-  modifier isMatchOver() {
-    require(currentPosition != lastPosition, 'No moves left');
-    _;
-  }
-
   modifier isValidMove(uint8 position, Moves _move) {
     require(map[position][uint8(_move)] != 0, 'Invalid move');
     _;
@@ -62,7 +53,7 @@ contract Labyrinth {
   }
 
   // Makes a move for player
-  function move(Moves _move) public onlyOwnerOrPlayer isMatchOver isValidMove(currentPosition, _move) returns (uint8) {
+  function move(Moves _move) external onlyOwner isValidMove(currentPosition, _move) returns (uint8) {
     // Updates player position
     _updatePosition(currentPosition, map[currentPosition][uint8(_move)]);
     // Adds player new position in its sequence of moves
@@ -76,7 +67,7 @@ contract Labyrinth {
   }
 
   // Goes back one position
-  function moveBack() public onlyOwnerOrPlayer doPreviousMovesExist {
+  function moveBack() external onlyOwner doPreviousMovesExist {
     // Removes and stores last position
     uint8 oldPosition = lastMoves[lastMoves.length - 1];
     lastMoves.pop();
@@ -85,12 +76,12 @@ contract Labyrinth {
   }
 
   // Adds a new available move to map
-  function addMove(uint8 from, uint8 to, Moves _move) public onlyOwner {
+  function addMove(uint8 from, uint8 to, Moves _move) external onlyOwner {
     map[from][uint8(_move)] = to;
   }
 
   // Cleans all moves
-  function cleanMoves() public onlyOwner {
+  function cleanMoves() external onlyOwner {
     delete lastMoves;
     _deleteMovesForPosition(currentPosition);
   }
