@@ -16,7 +16,7 @@ Docker compose will be used to run all apps together.
 
 ### Testnet - Ropsten
 
-A .secret file should be placed at root directory with the mnemonics of your wallet, e.g: "face business large tissue", and a .infuraKey file with an Infura key to run its node. To load your wallet with ethers the following [faucet]("https://faucet.ropsten.be/") can be used.
+A .secret file should be placed at root directory with the mnemonics of your wallet, e.g: "face business large tissue", and a .infuraKey file with an Infura key to run its node. To load your wallet with ethers the following [faucet](https://faucet.ropsten.be/) can be used.
 To compile contract:
 
 ```
