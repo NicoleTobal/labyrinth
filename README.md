@@ -14,6 +14,12 @@ Docker compose will be used to run all apps together.
 
 ## Smart Contract
 
+To be able to run the smart contract, [truffle](https://www.trufflesuite.com/) should be installed and then run:
+
+```
+npm install
+```
+
 ### Testnet - Ropsten
 
 A .secret file should be placed at root directory with the mnemonics of your wallet, e.g: "face business large tissue", and a .infuraKey file with an Infura key to run its node. To load your wallet with ethers the following [faucet](https://faucet.ropsten.be/) can be used.
